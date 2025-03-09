@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from decimal import Decimal
-from product.models import Category, Product, Review
+from product.models import Category, Product, Review, ProductImage
 from django.contrib.auth import get_user_model
 
 # class CategorySerializers(serializers.Serializer):
@@ -36,10 +36,21 @@ class CategorySerializers(serializers.ModelSerializer):
 #     def calculate_tax(self, product):
 #         return round(product.price * Decimal(1.1), 2)
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id','image']
+        
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        productImage = ProductImage.objects.create(product_id=product_id, **validated_data)
+        return productImage
+
 class ProductSerializers(serializers.ModelSerializer):
+    images = ProductImageSerializer(many=True, read_only=True)
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'price_with_tax', 'category_all2']
+        fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'price_with_tax', 'category_all2', 'images']
         
     category_all2 = serializers.HyperlinkedRelatedField(
         queryset = Category.objects.all(),
@@ -64,6 +75,8 @@ class ProductSerializers(serializers.ModelSerializer):
     #     product = Product(**validated_data)
     #     product.other = 1 ## other kono kicu add korte cayle save korar age
     #     product.save()
+    
+
     
 class SimpleUserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(method_name='get_current_user_name')

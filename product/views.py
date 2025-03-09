@@ -3,9 +3,9 @@ from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from product.models import Product, Category, Review
+from product.models import Product, Category, Review, ProductImage
+from product.serializers import ProductSerializers, CategorySerializers, ReviewSerializer, ProductImageSerializer
 from django.shortcuts import get_object_or_404
-from product.serializers import ProductSerializers, CategorySerializers, ReviewSerializer
 from django.db.models import Count
 from rest_framework.views import APIView
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
@@ -53,6 +53,17 @@ class ProductViewSet(ModelViewSet):
             return Response({'message':"Product with stock more than 10 could not be deleted"})
         self.perform_destroy(product)
         return Response(status=status.HTTP_204_NO_CONTENT) 
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['producted_pk'])
+    
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['producted_pk']}
+
     
     
 
@@ -244,3 +255,4 @@ class ReviewViewSet(ModelViewSet):
     
     def get_serializer_context(self):
         return {'product_id': self.kwargs['producted_pk']}
+    
