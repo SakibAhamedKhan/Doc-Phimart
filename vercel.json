@@ -1,35 +1,13 @@
 {
-    "build": {
-      "env": {
-        "PYTHON_VERSION": "3.11.3"
-      }
-    },
-    "builds": [
-      {
-        "src": "phi_mart/wsgi.py",
-        "use": "@vercel/python",
-        "config": {
-          "maxLambdaSize": "15mb",
-          "runtime": "python3.11.3"
-        }
-      },
-      {
-        "src": "staticfiles/",
-        "use": "@vercel/static"
-      }
-    ],
+    "builds": [{
+      "src": "phi_mart/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.11.3" }
+    }],
     "routes": [
-      {
-        "src": "/static/(.*)",
-        "dest": "/static/$1"
-      },
-      {
-        "src": "/media/(.*)",
-        "dest": "/media/$1"
-      },
       {
         "src": "/(.*)",
         "dest": "phi_mart/wsgi.py"
       }
     ]
-  }
+}
