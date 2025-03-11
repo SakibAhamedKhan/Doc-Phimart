@@ -13,7 +13,7 @@ class CategorySerializers(serializers.ModelSerializer):
         model = Category
         fields =  ['name', 'description', 'product_count']
         
-    product_count = serializers.IntegerField(required=False)
+    product_count = serializers.IntegerField(required=False, help_text="Return the number of product in this category")
 
 # class ProductSerializers(serializers.Serializer):
 #     id = serializers.IntegerField()

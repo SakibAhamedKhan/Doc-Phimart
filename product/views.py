@@ -20,8 +20,16 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from api.permissions import IsAdminOrReadOnly, FullDjangoModelPermission
 from rest_framework.permissions import DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
 from product.permissions import IsReviewAuthorOrReadonly
+from drf_yasg.utils import swagger_auto_schema
 
 class ProductViewSet(ModelViewSet):
+    """
+    API endpoint for managing products in the e-commerce store
+    - Allows authenticated admin to create , update and delete products
+    - Allows users to browse and filter product
+    - Support searching by name, description and category
+    - Support ordering by price and updated_at
+    """
     queryset = Product.objects.select_related('category').all()
     serializer_class = ProductSerializers
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -46,6 +54,26 @@ class ProductViewSet(ModelViewSet):
     #         queryset = Product.objects.filter(category_id=category_id)
         
     #     return queryset
+    @swagger_auto_schema(
+        operation_summary="Retrive a list of products"
+    )
+    def list(self, request, *args, **kwargs):
+        """Retrive all the products"""
+        return super().list(request, *args, **kwargs)
+    
+    @swagger_auto_schema(
+        operation_summary="Create a product by admin",
+        operation_description="This allow an admin to create a product.",
+        request_body=ProductSerializers,
+        responses={
+            201: ProductSerializers,
+            400: "Bad Request"
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        """Only authenticate admin can create products"""
+        return super().create(request, *args, **kwargs)
+    
     
     def destroy(self, request, *args, **kwargs):
         product = self.get_object()
